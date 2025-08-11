@@ -13,9 +13,24 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
+
+         <!-- Image -->
+         <div>
+          <x-input-label for="image" :value="__('Avatar')" />
+          <x-text-input id="image" class="block mt-1 w-full" type="file" name="image"
+              :value="old('image')" autofocus />
+          <x-input-error :messages="$errors->get('image')" class="mt-2" />
+        </div>
+
+
+        <div>
+            <x-input-label for="username" :value="__('userName')" />
+            <x-text-input id="username" name="username" type="text" class="mt-1 block w-full" :value="old('username', $user->username)" required autofocus autocomplete="username" />
+            <x-input-error class="mt-2" :messages="$errors->get('username')" />
+        </div>
 
         <div>
             <x-input-label for="name" :value="__('Name')" />
@@ -47,6 +62,14 @@
             @endif
         </div>
 
+         <div class="mt-4">
+                        <x-input-label for="bio" :value="__('Bio')" />
+                        <x-input-textarea id="bio" class="block mt-1 w-full" name="bio"
+                            >{{ old('bio') }}</x-input-textarea>
+                        <x-input-error :messages="$errors->get('bio')" class="mt-2" />
+                    </div>
+
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
@@ -59,6 +82,7 @@
                     class="text-sm text-gray-600"
                 >{{ __('Saved.') }}</p>
             @endif
+                   
         </div>
     </form>
 </section>
