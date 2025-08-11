@@ -14,7 +14,11 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
+    {   User::factory()->create([
+        'name' => 'Test User',
+        'username' => 'testuser',
+        'email' => 'test@example'
+    ]);
         $categories = [
             'Technolgy',
             'Health',
@@ -27,6 +31,6 @@ class DatabaseSeeder extends Seeder
             Category::create(['name'=> $category]);
         }
 
-        Post::factory(100)->create();
+        
     }
 }
