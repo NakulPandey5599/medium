@@ -1,13 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PublicProfileController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+
+Route::get('/@{user:username}', [PublicProfileController::class, 'show'])->name('profile.show');
 
 Route::get('/', [PostController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/post/create', [PostController::class, 'create'])->middleware(['auth', 'verified'])->name('post.create');
