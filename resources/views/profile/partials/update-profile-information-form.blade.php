@@ -17,6 +17,12 @@
         @csrf
         @method('patch')
 
+         @if ($user->imageUrl())
+            <div>
+                <img src="{{ $user->imageUrl() }}" alt="{{ $user->name }}" class="rounded-full h-20 w-20">
+            </div>
+        @endif
+
          <!-- Image -->
          <div>
           <x-input-label for="image" :value="__('Avatar')" />

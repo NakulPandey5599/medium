@@ -20,6 +20,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/post/create', [PostController::class, 'create'])->name('post.create');
 Route::post('/post/store', [PostController::class, 'store'])->name('post.store');
+Route::put('/post/{post}', [PostController::class, 'update'])->name('post.update');
+Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.destroy');
+Route::get('/post/{post:slug}/edit', [PostController::class, 'edit'])->name('post.edit');
+Route::get('/my-posts', [PostController::class, 'myPosts'])->name('myPosts');
 
 Route::post('/follow/{user}', [FollowerController::class, 'followUnfollow'])->name('follow');
 Route::post('/clap/{post}', [ClapController::class, 'clap'])->name('clap');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostUpdatedRequest;
 use App\Models\post;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -18,7 +19,10 @@ class PostController extends Controller
        
     { 
         $user = auth()->user();
-        $query = Post::latest();
+
+        $query = Post::with(['user','media'])
+        ->withCount('claps')
+        ->latest();
         if($user){
             $ids = $user->following()->pluck('users.id');
             $query->whereIn('user_id', $ids);
@@ -48,16 +52,16 @@ class PostController extends Controller
             'content'=>'required',
             'category_id'=>['required','exists:categories,id'],
         ]);
-            $image = $data['image'];
-            unset($data['image']);
+            // $image = $data['image'];
+            // unset($data['image']);
             $data['user_id'] = Auth::id();
-            $data['slug'] = Str::slug($data['title']);
         
 
-            $imagePath = $image->store('posts','public');
-            $data['image'] = $imagePath;
+            // $imagePath = $image->store('posts','public');
+            // $data['image'] = $imagePath;
 
-        Post::create($data);
+        $post = Post::create($data);
+        $post->addMediaFromRequest('image')->toMediaCollection();
         return redirect()->route('dashboard');
     }
 
@@ -76,15 +80,35 @@ class PostController extends Controller
      */
     public function edit(post $post)
     {
-        //
+        if($post->user_id !== Auth::id()){
+            abort(403, 'Unauthorized action.');
+        }
+        $categories = Category::get();
+        return view('post.edit', [
+            'post' => $post,
+            'categories' => $categories,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, post $post)
+    public function update(PostUpdatedRequest $request, post $post)
     {
-        //
+        if($post->user_id !== Auth::id()){
+            abort(403, 'Unauthorized action.');
+        }
+
+        $data = $request->validated();
+
+        $post->update($data);
+        if($data['image'] ?? false){
+            $post->addMediaFromRequest('image')
+            ->toMediaCollection();
+        }
+
+        return redirect()->route('myPosts');
+
     }
 
     /**
@@ -92,12 +116,31 @@ class PostController extends Controller
      */
     public function destroy(post $post)
     {
-        //
+        if($post->user_id !== Auth::id()){
+            abort(403, 'Unauthorized action.');
+        }
+        $post->delete();
+        return redirect()->route('dashboard');
     }
 
     public function category(Category $category)
     {
-        $posts = $category->posts()->latest()->simplePaginate(5);
+        $posts = $category->posts()
+        ->with(['user','media'])
+        ->withCount('claps')
+        ->latest()
+        ->simplePaginate(5);
+        return view('post.index', ['posts' => $posts]);
+    }
+
+    public function myPosts()
+    {
+        $user = auth()->user();
+        $posts = $user->posts()
+        ->with(['user','media'])
+        ->withCount('claps')
+        ->latest()
+        ->simplePaginate(5);
         return view('post.index', ['posts' => $posts]);
     }
 }
