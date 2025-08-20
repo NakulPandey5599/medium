@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PostUpdatedRequest;
 use App\Models\post;
 use App\Models\Category;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\PostCreateRequest;
+use App\Http\Requests\PostUpdatedRequest;
 
 class PostController extends Controller
 {
@@ -25,6 +26,7 @@ class PostController extends Controller
         ->latest();
         if($user){
             $ids = $user->following()->pluck('users.id');
+            $ids->push($user->id);
             $query->whereIn('user_id', $ids);
         }
 
@@ -44,24 +46,22 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store( PostCreateRequest $request)
     {
-        $data = $request->validate([
-            'image'=> ['required','image','mimes:jepg,png,jpg,gif,svg','max:2048'],
-            'title'=>'required',
-            'content'=>'required',
-            'category_id'=>['required','exists:categories,id'],
-        ]);
-            // $image = $data['image'];
-            // unset($data['image']);
-            $data['user_id'] = Auth::id();
-        
+        $data = $request->validated();
 
-            // $imagePath = $image->store('posts','public');
-            // $data['image'] = $imagePath;
+        // $image = $data['image'];
+        // unset($data['image']);
+        $data['user_id'] = Auth::id();
+
+        // $imagePath = $image->store('posts', 'public');
+        // $data['image'] = $imagePath;
 
         $post = Post::create($data);
-        $post->addMediaFromRequest('image')->toMediaCollection();
+
+        $post->addMediaFromRequest('image')
+            ->toMediaCollection();
+
         return redirect()->route('dashboard');
     }
 

@@ -51,7 +51,7 @@
                 <!-- Clap Section -->
                 <x-clap-button :post="$post" />
                 <!-- Clap Section -->
-
+            
                 <!-- Content Section -->
                 <div class="mt-8">
                     <img src="{{ $post->imageUrl() }}" alt="{{ $post->title }}" class="w-full">

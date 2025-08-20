@@ -21,7 +21,11 @@ class User extends Authenticatable implements MustVerifyEmail, HasMedia
      * The attributes that are mass assignable.
      *
      * @var list<string>
+     * 
      */
+    
+    protected $table = 'users';
+
     protected $fillable = [
         'name',
         'username',
